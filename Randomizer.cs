@@ -12,13 +12,13 @@ namespace Sidit.Randomizer
 
         public static readonly Random random = new Random();
 
-        public static bool GetBool() => random.Next(2) == 0;
+        public static bool GetBool() => Range(2) == 0;
         public static int GetPosNeg() => GetBool() ? 1 : -1;
 
-        public static byte GetByte() => (byte)random.Next(256);
-        public static sbyte GetSByte() => (sbyte)random.Next(-128, 128);
+        public static byte GetByte() => (byte)Range(256);
+        public static sbyte GetSByte() => (sbyte)Range(-128, 128);
 
-        public static float GetFloat() => (float)random.NextDouble();
+        public static float GetFloat() => (float)GetDouble();
         public static double GetDouble() => random.NextDouble();
 
         public static int Range(int max) => random.Next(max);
@@ -38,15 +38,21 @@ namespace Sidit.Randomizer
 
         public static float GetUnusedRare<TValue>(IEnumerable<IRareValue<TValue>> rareValues) => MaxChance - rareValues.Sum(x => x.Chance);
 
-        public static TValue SafeRare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues) => SafeRare(defaultValue, rareValues);
-        public static TValue SafeRare<TValue>(TValue defaultValue, IEnumerable<IRareValue<TValue>> rareValues)
+        public static void CheckRare<TValue>(IEnumerable<IRareValue<TValue>> rareValues)
         {
             float unusedRare = GetUnusedRare(rareValues);
 
             if (float.IsNegative(unusedRare))
+            {
                 throw new RareSumHigherThanMaxValueException($"The amount of rare is higher than the maximum by {-unusedRare}");
-            else
-                return Rare(defaultValue, rareValues);
+            }
+        }
+
+        public static TValue CheckedRare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues) => CheckedRare(defaultValue, rareValues);
+        public static TValue CheckedRare<TValue>(TValue defaultValue, IEnumerable<IRareValue<TValue>> rareValues)
+        {
+            CheckRare(rareValues);
+            return Rare(defaultValue, rareValues);
         }
 
         public static TValue Rare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues) => Rare(defaultValue, rareValues);
