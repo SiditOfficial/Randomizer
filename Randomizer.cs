@@ -28,40 +28,34 @@ namespace Sidit.Randomizer
             return chance > GetFloat();
         }
 
-        public static void SafeRare(Action redundantAction, params IRareAction[] rareActions)
+        public static TValue SafeRare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareActions)
         {
             float rareSum = rareActions.Sum(x => x.Chance);
 
             if (rareSum > MaxChance)
-            {
                 throw new RareSumHigherThanMaxValueException($"The amount of rare is higher than the maximum by {rareSum - MaxChance}");
-            }
             else
-            {
-                Rare(redundantAction, rareActions);
-            }
+                return Rare(defaultValue, rareActions);
         }
 
-        public static void Rare(Action redundantAction, params IRareAction[] rareActions)
+        public static TValue Rare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues)
         {
             float chanceMultipler = 1f;
             float remainingChance = MaxChance;
 
-            foreach (IRareAction rareAction in rareActions.OrderByDescending(x => x.Chance))
+            foreach (IRareValue<TValue> rareValue in rareValues.OrderByDescending(x => x.Chance))
             {
-                if (Chance(rareAction.Chance * chanceMultipler))
+                if (Chance(rareValue.Chance * chanceMultipler))
                 {
-                    rareAction.Invoke();
-                    return;
+                    return rareValue.Get();
                 }
                 else
                 {
-                    remainingChance -= rareAction.Chance;
+                    remainingChance -= rareValue.Chance;
                     chanceMultipler = MaxChance / remainingChance;
                 }
-
             }
-            redundantAction?.Invoke();
+            return defaultValue;
         }
     }
 }
