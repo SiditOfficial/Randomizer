@@ -29,15 +29,17 @@ namespace Sidit.Randomizer
             return chance > GetFloat();
         }
 
-        public static TValue SafeRare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues) => SafeRare(defaultValue, rareValues);
-        public static TValue SafeRare<TValue>(TValue defaultValue, IEnumerable<IRareValue<TValue>> rareActions)
-        {
-            float rareSum = rareActions.Sum(x => x.Chance);
+        public static float GetUnusedRare<TValue>(IEnumerable<IRareValue<TValue>> rareValues) => MaxChance - rareValues.Sum(x => x.Chance);
 
-            if (rareSum > MaxChance)
-                throw new RareSumHigherThanMaxValueException($"The amount of rare is higher than the maximum by {rareSum - MaxChance}");
+        public static TValue SafeRare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues) => SafeRare(defaultValue, rareValues);
+        public static TValue SafeRare<TValue>(TValue defaultValue, IEnumerable<IRareValue<TValue>> rareValues)
+        {
+            float unusedRare = GetUnusedRare(rareValues);
+
+            if (float.IsNegative(unusedRare))
+                throw new RareSumHigherThanMaxValueException($"The amount of rare is higher than the maximum by {-unusedRare}");
             else
-                return Rare(defaultValue, rareActions);
+                return Rare(defaultValue, rareValues);
         }
 
         public static TValue Rare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues) => Rare(defaultValue, rareValues);
