@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using Random = System.Random;
 
 namespace Sidit.Randomizer
@@ -28,7 +29,8 @@ namespace Sidit.Randomizer
             return chance > GetFloat();
         }
 
-        public static TValue SafeRare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareActions)
+        public static TValue SafeRare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues) => SafeRare(defaultValue, rareValues);
+        public static TValue SafeRare<TValue>(TValue defaultValue, IEnumerable<IRareValue<TValue>> rareActions)
         {
             float rareSum = rareActions.Sum(x => x.Chance);
 
@@ -38,7 +40,8 @@ namespace Sidit.Randomizer
                 return Rare(defaultValue, rareActions);
         }
 
-        public static TValue Rare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues)
+        public static TValue Rare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues) => Rare(defaultValue, rareValues);
+        public static TValue Rare<TValue>(TValue defaultValue, IEnumerable<IRareValue<TValue>> rareValues)
         {
             float chanceMultipler = 1f;
             float remainingChance = MaxChance;
