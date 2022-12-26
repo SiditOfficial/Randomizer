@@ -30,6 +30,10 @@ namespace Sidit.Randomizer
         public static double Range(double max) => GetDouble() * max;
         public static double Range(double min, double max) => GetDouble() * (max - min) + min;
 
+        public static T ChooseRandom<T>(params T[] elements) => GetRandomFrom(elements);
+
+        public static T GetRandomFrom<T>(IEnumerable<T> enumerable) => enumerable.ElementAt(Range(enumerable.Count()));
+
         public static bool Chance(float chance)
         {
             chance /= 100f;
@@ -48,14 +52,12 @@ namespace Sidit.Randomizer
             }
         }
 
-        public static TValue CheckedRare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues) => CheckedRare(defaultValue, rareValues);
         public static TValue CheckedRare<TValue>(TValue defaultValue, IEnumerable<IRareValue<TValue>> rareValues)
         {
             CheckRare(rareValues);
             return Rare(defaultValue, rareValues);
         }
 
-        public static TValue Rare<TValue>(TValue defaultValue, params IRareValue<TValue>[] rareValues) => Rare(defaultValue, rareValues);
         public static TValue Rare<TValue>(TValue defaultValue, IEnumerable<IRareValue<TValue>> rareValues)
         {
             float chanceMultipler = 1f;
