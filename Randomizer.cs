@@ -13,6 +13,7 @@ namespace Sidit.Randomizer
         public static readonly Random random = new Random();
 
         public static bool GetBool() => random.Next(2) == 0;
+        public static int GetPosNeg() => GetBool() ? 1 : -1;
 
         public static byte GetByte() => (byte)random.Next(256);
         public static sbyte GetSByte() => (sbyte)random.Next(-128, 128);
@@ -21,7 +22,13 @@ namespace Sidit.Randomizer
         public static double GetDouble() => random.NextDouble();
 
         public static int Range(int max) => random.Next(max);
-        public static float Range(float max) => random.Next((int)max) + GetFloat();
+        public static int Range(int min, int max) => random.Next(min, max);
+
+        public static float Range(float max) => GetFloat() * max;
+        public static float Range(float min, float max) => GetFloat() * (max - min) + min;
+
+        public static double Range(double max) => GetDouble() * max;
+        public static double Range(double min, double max) => GetDouble() * (max - min) + min;
 
         public static bool Chance(float chance)
         {
